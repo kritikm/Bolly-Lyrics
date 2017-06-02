@@ -1,8 +1,8 @@
 import csv
 dataroot = '../four_class_data/'
-with open('../dataset/258.csv') as data:
+with open('../dataset/772.csv') as data:
     reader = csv.reader(data, delimiter = ',', quotechar = '"')
-    count = 258
+    count = 772
     for row in reader:
         dataClass = row[2]
         filePath = dataroot + dataClass + "/" + str(count)

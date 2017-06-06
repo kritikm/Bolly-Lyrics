@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 from collections import defaultdict
 import gensim
@@ -72,33 +75,35 @@ bag_of_words = [dictionary.doc2bow(song) for song in songs]
 # gensim.corpora.MmCorpus.serialize('bag_of_words.mm', bag_of_words)
 # dictionary.save('dictionary.dict')
 
-# tfidf = gensim.models.TfidfModel(bag_of_words)
-# records = tfidf[bag_of_words]
-# dense_tfidf = gensim.matutils.corpus2dense(records, num_terms = n_unique_tokens).transpose()
-dense_bow = gensim.matutils.corpus2dense(bag_of_words, num_terms = n_unique_tokens).transpose()
+tfidf = gensim.models.TfidfModel(bag_of_words)
+records = tfidf[bag_of_words]
+dense_tfidf = gensim.matutils.corpus2dense(records, num_terms = n_unique_tokens).transpose()
+# dense_bow = gensim.matutils.corpus2dense(bag_of_words, num_terms = n_unique_tokens).transpose()
+
+dataset = dense_tfidf
 
 kf = KFold(n_splits = 10, shuffle = True)
 
 accuracies = []
 scores = []
 
-for it in range(10):
+for it in range(50):
     print ("Iteration ", it)
-    for train, test in kf.split(dense_bow):
+    for train, test in kf.split(dataset):
         train_set = []
         train_labels = []
         test_set = []
         test_labels = []
         for i in train:
-            train_set.append(dense_bow[i])
+            train_set.append(dataset[i])
             train_labels.append(target[i])
         for i in test:
-            test_set.append(dense_bow[i])
+            test_set.append(dataset[i])
             test_labels.append(target[i])
 
-        classifier = KNeighborsClassifier()
+        # classifier = KNeighborsClassifier()
         # classifier = nb.GaussianNB()
-        # classifier = nb.MultinomialNB()
+        classifier = nb.MultinomialNB()
         # classifier = svm.SVC()
         # classifier = mlpc(solver = 'lbfgs', hidden_layer_sizes = (15, 5), max_iter = 500)
         predicted = classifier.fit(train_set, train_labels).predict(test_set)
